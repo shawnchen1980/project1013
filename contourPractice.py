@@ -4,7 +4,7 @@ Created on Wed Oct 16 09:30:52 2019
 
 @author: shawn
 """
-
+import numpy as np
 from sklearn.metrics import pairwise
 import cv2  
 #读取图像文件数据  
@@ -65,10 +65,11 @@ cv2.drawContours(img,hull,-1,(0,255,0),2)
 
 cv2.imshow("binary",binary)
 cv2.imshow("img", img)  
-#cv2.waitKey(0)  
+#cv2.waitKey(1)  
+#cv2.destroyAllWindows()
 
 while(True):
-    keypress = cv2.waitKey(0) & 0xFF
+    keypress = cv2.waitKey(1) & 0xFF
     # if the user pressed "q", then stop looping
     if keypress == ord("q"):
         cv2.destroyAllWindows()
