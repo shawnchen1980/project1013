@@ -10,6 +10,7 @@ import os # For handling directories
 from PIL import Image # For handling the images
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg # Plotting
+import cv2
 
 lookup = dict()
 reverselookup = dict()
@@ -35,7 +36,9 @@ for i in range(0, 10): # Loop over the ten top-level folders
                                  str(i) + '/' + j + '/' + k).convert('L')
                                 # Read in and convert to greyscale
                 img = img.resize((320, 120))
-                arr = np.array(img)
+                img=np.array(img)
+                ret, binary = cv2.threshold(img,50,255,cv2.THRESH_BINARY)
+                arr = np.array(binary)
                 x_data.append(arr) 
                 count = count + 1
             y_values = np.full((count, 1), lookup[j]) 
@@ -84,6 +87,6 @@ model.compile(optimizer='rmsprop',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 model.fit(x_train, y_train, epochs=10, batch_size=64, verbose=1, validation_data=(x_validate, y_validate))
-#model.save("mymodel.h5")
+model.save("mymodel.h5")
 [loss, acc] = model.evaluate(x_test,y_test,verbose=1)
 print("Accuracy:" + str(acc))
