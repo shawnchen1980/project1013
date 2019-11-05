@@ -23,9 +23,9 @@ img_counter = 500
 save_images, selected_gesture = False, 'peace'
 smart_home = True
 #第二部 修改下面的数组内容，使其和datasets下的子文件夹名相对应
-gests=["zero","one","two","three","four"]
+gests=["A","B","C"]
 #第三步，修改下面的下标值，指向当前将要获取的手势图片对应的文件夹
-current_gesture=gests[4]
+current_gesture=gests[0]
 path=f"datasets/{current_gesture}"
 
 #第四步，运行程序，按b设置好背景，做手势，按p记录手势到对应文件夹
@@ -40,7 +40,7 @@ filecount=countFiles(path)
 
 
 #sonos = SoCo(sonos_ip)
-
+#第五步，调整下面的字典，使其对应新模型
 gesture_names = {0: 'zero',
                  1: 'one',
                  2: 'two',
@@ -55,7 +55,7 @@ gesture_names = {0: 'zero',
 #    print(result)
 #    return (result)
 #
-#
+#第六步，加载新模型
 model=load_model("mymodel0-4.h5")
 def predict_rgb_image_vgg(image):
     image = np.array(image, dtype='float32')
