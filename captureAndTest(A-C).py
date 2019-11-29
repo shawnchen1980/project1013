@@ -25,7 +25,7 @@ smart_home = True
 #第二部 修改下面的数组内容，使其和datasets下的子文件夹名相对应
 gests=["A","B","C"]
 #第三步，修改下面的下标值，指向当前将要获取的手势图片对应的文件夹
-current_gesture=gests[0]
+current_gesture=gests[2]
 path=f"datasets/{current_gesture}"
 
 #第四步，运行程序，按b设置好背景，做手势，按p记录手势到对应文件夹
@@ -41,11 +41,10 @@ filecount=countFiles(path)
 
 #sonos = SoCo(sonos_ip)
 #第五步，调整下面的字典，使其对应新模型
-gesture_names = {0: 'zero',
-                 1: 'one',
-                 2: 'two',
-                 3: 'three',
-                 4: 'four'}
+gesture_names = {0: 'A',
+                 1: 'B',
+                 2: 'C',
+                 }
 
 #model = load_model('models/saved_model.hdf5')
 #
@@ -56,7 +55,7 @@ gesture_names = {0: 'zero',
 #    return (result)
 #
 #第六步，加载新模型
-model=load_model("mymodel0-4.h5")
+model=load_model("mymodel(a-c).h5")
 def predict_rgb_image_vgg(image):
     image = np.array(image, dtype='float32')
     image /= 255
@@ -112,11 +111,9 @@ def predictImage(path):
     return (result,pred_array[0])
 
 def predictBinaryImage(img):
-    reverse_map = {0:'zero',
-                1:'one',
-                2:'two',
-                3:'three',
-                4:'four'
+    reverse_map = {0:'A',
+                1:'B',
+                2:'C'
                 }
 
     
@@ -134,7 +131,7 @@ def predictBinaryImage(img):
     return (result,mscore)
 
 # Camera
-camera = cv2.VideoCapture(1)
+camera = cv2.VideoCapture(0)
 camera.set(10, 200)
 lastTime=time.time()
 question=-1
@@ -222,6 +219,7 @@ while camera.isOpened():
         camera.release()
         break
     elif k == ord('b'):  # press 'b' to capture the background
+        cv2.imwrite("background.jpg",frame)
         bgModel = cv2.createBackgroundSubtractorMOG2(0, bgSubThreshold)
 #        b.set_light(6, on_command)
         time.sleep(2)
@@ -251,57 +249,7 @@ while camera.isOpened():
         prediction, score = predictBinaryImage(target)
         print(prediction,score)
 
-#        if smart_home:
-#            if prediction == 'Palm':
-#                try:
-#                    action = "Lights on, music on"
-#
-#                    # sonos.play()
-##                    pygame.mixer.music.unpause()
-#                # Turn off smart home actions if devices are not responding
-#                except ConnectionError:
-#                    smart_home = False
-#                    pass
-#
-#            elif prediction == 'Fist':
-#                try:
-#                    action = 'Lights off, music off'
-##                    b.set_light(6, off_command)
-#                    # sonos.pause()
-##                    pygame.mixer.music.pause()
-#                except ConnectionError:
-#                    smart_home = False
-#                    pass
-#
-#            elif prediction == 'L':
-#                try:
-#                    action = 'Volume down'
-#                    # sonos.volume -= 15
-#                    vol.decrease(0.2)
-##                    pygame.mixer.music.set_volume(vol.level)
-#                except ConnectionError:
-#                    smart_home = False
-#                    pass
-#
-#            elif prediction == 'Okay':
-#                try:
-#                    action = 'Volume up'
-#                    # sonos.volume += 15
-#                    vol.increase(0.2)
-##                    pygame.mixer.music.set_volume(vol.level)
-#                except ConnectionError:
-#                    smart_home = False
-#                    pass
-#
-#            elif prediction == 'Peace':
-#                try:
-#                    action = ''
-#                except ConnectionError:
-#                    smart_home = False
-#                    pass
-#
-#            else:
-#                pass
+
 
     elif k == ord('p'):
 #        img_name = f"./frames/drawings/drawing_{selected_gesture}_{img_counter}.jpg".format(
@@ -332,6 +280,46 @@ while camera.isOpened():
 #        img_counter += 1
     elif k == ord('q'):
         question=random.randint(0,4)
+    elif k== ord('d'):
+        ret, frame = camera.read()
+        cv2.imwrite("0.jpg",frame)
+        frame = cv2.bilateralFilter(frame, 5, 50, 100)  # smoothing filter
+        cv2.rectangle(frame, (int(cap_region_x_begin * frame.shape[1]), 0),
+                      (frame.shape[1], int(cap_region_y_end * frame.shape[0])), (255, 0, 0), 2)
+        cv2.imwrite("1.jpg",frame)
+        frame = cv2.flip(frame, 1)  # flip the frame horizontally
+        cv2.imwrite("2.jpg",frame)
+#        cv2.rectangle(frame, (0, 0),
+#                      (int(cap_region_x_begin * frame.shape[1]), int(cap_region_y_end * frame.shape[0])), (255, 0, 0), 2)
+#        img = remove_background(frame)
+        cv2.imwrite("20.jpg",frame)
+        fgmask = bgModel.apply(frame, learningRate=learningRate)
+        cv2.imwrite("21.jpg",fgmask)
+        kernel = np.ones((3, 3), np.uint8)
+        fgmask = cv2.erode(fgmask, kernel, iterations=1)
+        cv2.imwrite("22.jpg",fgmask)
+        img = cv2.bitwise_and(frame, frame, mask=fgmask)
+        cv2.imwrite("3.jpg",img)
+#        img = img[0:int(cap_region_y_end * frame.shape[0]),
+#              int(cap_region_x_begin * frame.shape[1]):frame.shape[1]]  # clip the ROI
+        img = img[0:int(cap_region_y_end * frame.shape[0]),
+              0:int(cap_region_x_begin * frame.shape[1])]  # clip the ROI
+        cv2.imwrite("4.jpg",img)
+
+        # cv2.imshow('mask', img)
+
+        # convert the image into binary image
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        cv2.imwrite("5.jpg",gray)
+        blur = cv2.GaussianBlur(gray, (blurValue, blurValue), 0)
+        cv2.imwrite("6.jpg",blur)
+        # cv2.imshow('blur', blur)
+        ret, thresh = cv2.threshold(blur, threshold, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        cv2.imwrite("7.jpg",thresh)
+        cv2.destroyAllWindows()
+        camera.release()
+        break        
+
     elif k == ord('t'):
 
         print('Tracker turned on.')
