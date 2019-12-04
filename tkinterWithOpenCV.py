@@ -5,7 +5,7 @@ Created on Fri Nov 29 11:02:44 2019
 @author: Sincereedu
 """
 
-import tkinter
+import tkinter as tk
 import cv2
 import PIL.Image, PIL.ImageTk
 import time
@@ -45,11 +45,11 @@ class App:
         self.video_source = video_source
         self.vid = MyVideoCapture(video_source)
         
-        self.canvas = tkinter.Canvas(window, width = self.vid.width, height = self.vid.height)
+        self.canvas = tk.Canvas(window, width = self.vid.width, height = self.vid.height)
         self.canvas.pack()
         
-        self.btn_snapshot=tkinter.Button(window, text="Snapshot", width=50, command=self.snapshot)
-        self.btn_snapshot.pack(anchor=tkinter.CENTER, expand=True)
+        self.btn_snapshot=tk.Button(window, text="Snapshot", width=50, command=self.snapshot)
+        self.btn_snapshot.pack(anchor=tk.CENTER, expand=True)
         
         self.delay = 15
         self.update()
@@ -60,7 +60,7 @@ class App:
 
         if ret:
             self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(frame))
-            self.canvas.create_image(0, 0, image = self.photo, anchor = tkinter.NW)
+            self.canvas.create_image(0, 0, image = self.photo, anchor = tk.NW)
 
         self.window.after(self.delay, self.update)
      def snapshot(self):
@@ -70,4 +70,4 @@ class App:
              
 
  # Create a window and pass it to the Application object
-App(tkinter.Tk(), "Tkinter and OpenCV")
+App(tk.Tk(), "Tkinter and OpenCV",1)
